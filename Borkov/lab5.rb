@@ -53,10 +53,6 @@ def method1
           - 2 * @u_arr[i * @N, j * @N / (@T - @t0)] \
           + @u_arr[i * @N - 1, j * @N / (@T - @t0)])
 
-      # puts i * @N
-      # puts j * @N / (@T - @t0)
-      # puts @u_arr[i * @N, j * @N / (@T - @t0)]
-
       i = (i + @h).round(1)
     end
 
@@ -70,24 +66,19 @@ def method2
   j = @t0
   while j <= @T do
 
-    arr_a = Array.new(@N - 2, @sigma)
+    arr_a = Array.new(@N - 1, @sigma)
     arr_a[0] = 0
-    arr_b = Array.new(@N - 2, -(1 + 2 * @sigma))
-    arr_c = Array.new(@N - 2, @sigma)
-    arr_c[@N - 3] = 0
-    arr_d = [- (@u_arr[0, j * @N / (@T - @t0)] + @sigma * @phi0)]
-    arr_d[@N - 2] = -(@u_arr[@N - 1, j * @N / (@T - @t0)] + @sigma * @phi1)
-    i = @x0 + @h
-    while i < @x1 - (2 * @h) do
-      arr_d[i * @N] = - @u_arr[i * @N, j * @N / (@T - @t0)]
+    arr_b = Array.new(@N - 1, -(1 + 2 * @sigma))
+    arr_c = Array.new(@N - 1, @sigma)
+    arr_c[@N - 2] = 0
 
-      i = (i + @h).round(1)
+    arr_d = [- (@u_arr[1, j * @N / (@T - @t0)] + @sigma * @phi0)]
+    i = 2
+    while i <= @N - 2 do
+      arr_d[i - 1] = - @u_arr[i, j * @N / (@T - @t0)]
+      i += 1
     end
-    # puts arr_a.to_s
-    # puts arr_b.to_s
-    # puts arr_c.to_s
-    # puts arr_d.to_s
-    # puts arr_d[@N - 2].to_s
+    arr_d[@N - 2] = -(@u_arr[@N - 1, j * @N / (@T - @t0)] + @sigma * @phi1)
 
     answer = slau(arr_a, arr_b, arr_c, arr_d)
 
@@ -103,15 +94,9 @@ end
 def tochnoe_reshenie
   i = @x0
   while i <= @x1 do
-    # puts i.to_s + ' !!!'
-    # puts xi(i)
     j = @t0
     while j <= @T do
-      # puts "#{i} and #{j}"
       @u_arr[i * @N, j * @N / (@T - @t0)] = u(i, j).round(7)
-      # puts i * @N
-      # puts j * @N / (@T - @t0)
-      # puts @u_arr[i * @N, j * @N / (@T - @t0)]
       j = (j + @tau).round(5)
     end
 
@@ -135,9 +120,9 @@ def slau(arr_a, arr_b, arr_c, arr_d)
   for i in 0...arr_a.size
     return if arr_b[i].abs < arr_a[i].abs + arr_c[i].abs
   end
-  #прямой ход
+  # прямой ход
   p = [- arr_c[0] / arr_b[0]]
-  q = [- arr_d[0] / arr_b[0]]
+  q = [arr_d[0] / arr_b[0]]
 
   for i in 1...arr_a.length
     p.append(- arr_c[i] / (arr_b[i] + arr_a[i] * p[i - 1]))
@@ -145,20 +130,21 @@ def slau(arr_a, arr_b, arr_c, arr_d)
   end
 
   #обратный ход
-  x = [q[-1]]
-  for i in 1...arr_a.count
-    x.append(p[arr_a.length - i - 1] * x[i - 1] + q[arr_a.size - i - 1])
+  x = [q[q.size - 1]]
+  i = arr_a.size - 2
+  while i >= 0
+    x.unshift(p[i] * x.first + q[i])
+    i -= 1
   end
 
-  puts x.reverse.to_s
-  return x.reverse
+  x
 end
 
-# refresh_conditions
-# puts output(tochnoe_reshenie)
-# puts "\n"
-# refresh_conditions
-# puts output(method1)
-# puts "\n"
+refresh_conditions
+puts output(tochnoe_reshenie)
+puts "\n"
+refresh_conditions
+puts output(method1)
+puts "\n"
 refresh_conditions
 puts output(method2)
