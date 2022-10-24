@@ -1,14 +1,19 @@
+# frozen_string_literal: true
+
 require 'narray'
 include Math
 $stdout = File.open('выходные данные.txt', 'w')
 
 # начальные условия
 def refresh_conditions
-  @N = 100
+  @N = 10
   @a = 0.01
-  @x0 = 0; @x1 = 1
-  @t0 = 0; @T = 4
-  @phi0 = 0; @phi1 = 0
+  @x0 = 0
+  @x1 = 1
+  @t0 = 0
+  @T = 4
+  @phi0 = 0
+  @phi1 = 0
   @h = @x1.fdiv @N
   @tau = (@T - @t0).fdiv @N
   @sigma = (@a * @tau).fdiv (@h * @h).round(8)
@@ -20,7 +25,7 @@ end
 
 def xi_fill
   i = @x0
-  while i <= @x1 do
+  while i <= @x1
     @u_arr[i * @N, 0] = xi(i).round(7)
 
     i = (i + @h).round(4)
@@ -34,20 +39,20 @@ def xi(x)
 end
 
 def u(x, t)
-  (E ** (-4 * PI * PI * @a * t)) * sin(2.0 * PI * x)
+  (E**(-4 * PI * PI * @a * t)) * sin(2.0 * PI * x)
 end
 
 def method1
   j = @t0
-  while j <= @T do
+  while j <= @T
 
     i = @x0 + @h
-    while i < @x1 do
+    while i < @x1
       @u_arr[i * @N, j * @N / (@T - @t0) + 1] = @u_arr[i * @N, j * @N / (@T - @t0)] + \
-        @sigma.round(7) * \
-          (@u_arr[i * @N + 1, j * @N / (@T - @t0)] \
-          - 2 * @u_arr[i * @N, j * @N / (@T - @t0)] \
-          + @u_arr[i * @N - 1, j * @N / (@T - @t0)])
+                                                @sigma.round(7) * \
+                                                (@u_arr[i * @N + 1, j * @N / (@T - @t0)] \
+                                                - 2 * @u_arr[i * @N, j * @N / (@T - @t0)] \
+                                                + @u_arr[i * @N - 1, j * @N / (@T - @t0)])
 
       i = (i + @h).round(3)
     end
@@ -60,7 +65,7 @@ end
 
 def method2
   j = @t0
-  while j <= @T do
+  while j <= @T
 
     arr_a = Array.new(@N - 1, @sigma)
     arr_a[0] = 0
@@ -70,7 +75,7 @@ def method2
 
     arr_d = [- (@u_arr[1, j * @N / (@T - @t0)] + @sigma * @phi0)]
     i = 2
-    while i <= @N - 2 do
+    while i <= @N - 2
       arr_d[i - 1] = - @u_arr[i, j * @N / (@T - @t0)]
       i += 1
     end
@@ -78,7 +83,7 @@ def method2
 
     answer = slau(arr_a, arr_b, arr_c, arr_d)
 
-    for i in 0...answer.size
+    (0...answer.size).each do |i|
       @u_arr[i + 1, j * @N / (@T - @t0) + 1] = answer[i]
     end
 
@@ -92,23 +97,23 @@ def method3
   refresh_conditions
   resh2 = method2
 
-  (0..@N).each { |i|
+  (0..@N).each do |i|
     j = @t0
-    while j <= @T do
+    while j <= @T
       @u_arr[i, j * @N / (@T - @t0)] = resh1[i, j * @N / (@T - @t0)] * @ves + resh2[i, j * @N / (@T - @t0)] * (1 - @ves)
 
       j += @tau
     end
-  }
+  end
 
   @u_arr
 end
 
 def tochnoe_reshenie
   i = @x0
-  while i <= @x1 do
+  while i <= @x1
     j = @t0
-    while j <= @T do
+    while j <= @T
       @u_arr[i * @N, j * @N / (@T - @t0)] = u(i, j).round(7)
       j = (j + @tau).round(5)
     end
@@ -120,9 +125,9 @@ end
 
 def output(arr)
   s = ''
-  for i in 0..@N
-    for j in 0..@N
-      s += arr[i, j].round(5).to_s + '; '
+  (0..@N).each do |i|
+    (0..@N).each do |j|
+      s += "#{arr[i, j].round(5)}; "
     end
     s += "\n"
   end
@@ -130,14 +135,14 @@ def output(arr)
 end
 
 def slau(arr_a, arr_b, arr_c, arr_d)
-  for i in 0...arr_a.size
+  (0...arr_a.size).each do |i|
     return if arr_b[i].abs < arr_a[i].abs + arr_c[i].abs
   end
   # прямой ход
   p = [- arr_c[0] / arr_b[0]]
   q = [arr_d[0] / arr_b[0]]
 
-  for i in 1...arr_a.length
+  (1...arr_a.length).each do |i|
     p.append(- arr_c[i] / (arr_b[i] + arr_a[i] * p[i - 1]))
     q.append((arr_d[i] - arr_a[i] * q[i - 1]) / (arr_b[i] + arr_a[i] * p[i - 1]))
   end
