@@ -2,14 +2,9 @@ require 'narray'
 include Math
 $stdout = File.open('выходные данные.txt', 'w')
 
-# PI       # => 3.141592653589793
-# E       # => 2.718281828459045
-# sin(0.0) # => 0.0
-# cos(0.0) # => 1.0
-
 # начальные условия
 def refresh_conditions
-  @N = 10
+  @N = 100
   @a = 0.01
   @x0 = 0; @x1 = 1
   @t0 = 0; @T = 4
@@ -18,6 +13,7 @@ def refresh_conditions
   @tau = (@T - @t0).fdiv @N
   @sigma = (@a * @tau).fdiv (@h * @h).round(8)
   @u_arr = NMatrix.float(@N + 1, @N + 1)
+  @ves = 0.5
 
   xi_fill
 end
@@ -27,7 +23,7 @@ def xi_fill
   while i <= @x1 do
     @u_arr[i * @N, 0] = xi(i).round(7)
 
-    i = (i + @h).round(1)
+    i = (i + @h).round(4)
   end
 
   @u_arr
@@ -53,7 +49,7 @@ def method1
           - 2 * @u_arr[i * @N, j * @N / (@T - @t0)] \
           + @u_arr[i * @N - 1, j * @N / (@T - @t0)])
 
-      i = (i + @h).round(1)
+      i = (i + @h).round(3)
     end
 
     j += @tau
@@ -91,6 +87,23 @@ def method2
   @u_arr
 end
 
+def method3
+  resh1 = method1
+  refresh_conditions
+  resh2 = method2
+
+  (0..@N).each { |i|
+    j = @t0
+    while j <= @T do
+      @u_arr[i, j * @N / (@T - @t0)] = resh1[i, j * @N / (@T - @t0)] * @ves + resh2[i, j * @N / (@T - @t0)] * (1 - @ves)
+
+      j += @tau
+    end
+  }
+
+  @u_arr
+end
+
 def tochnoe_reshenie
   i = @x0
   while i <= @x1 do
@@ -100,7 +113,7 @@ def tochnoe_reshenie
       j = (j + @tau).round(5)
     end
 
-    i = (i + @h).round(1)
+    i = (i + @h).round(3)
   end
   @u_arr
 end
@@ -109,7 +122,7 @@ def output(arr)
   s = ''
   for i in 0..@N
     for j in 0..@N
-      s += arr[i, j].to_s + '; '
+      s += arr[i, j].round(5).to_s + '; '
     end
     s += "\n"
   end
@@ -129,7 +142,7 @@ def slau(arr_a, arr_b, arr_c, arr_d)
     q.append((arr_d[i] - arr_a[i] * q[i - 1]) / (arr_b[i] + arr_a[i] * p[i - 1]))
   end
 
-  #обратный ход
+  # обратный ход
   x = [q[q.size - 1]]
   i = arr_a.size - 2
   while i >= 0
@@ -148,3 +161,6 @@ puts output(method1)
 puts "\n"
 refresh_conditions
 puts output(method2)
+puts "\n"
+refresh_conditions
+puts output(method3)
