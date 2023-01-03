@@ -9,7 +9,7 @@ K = 1000
 T = 1
 h = l/N
 tau = T/K
-sgm = h**2 / tau**2
+sigma = (a**2 * tau**2) / h**2
 
 tk = np.zeros(K)
 xn = np.zeros(N)
@@ -73,30 +73,30 @@ def implicit():
         u[0][j] = psi1()
         u[1][j] = psi2(j * h) * tau
 
-    ap = np.zeros(N)
-    bp = np.zeros(N)
-    cp = np.zeros(N)
-    dp = np.zeros(N)
+    a = np.zeros(N)
+    b = np.zeros(N)
+    c = np.zeros(N)
+    d = np.zeros(N)
 
-    for k in range(2,K):
+    for k in range(1,K-1):
 
-        ap[0] = 0
-        bp[0] = 1
-        cp[0] = 0
-        dp[0] = phi0(tau * k)
+        a[0] = 0
+        b[0] = 1
+        c[0] = 0
+        d[0] = phi0(tau * k)
 
         for j in range(1,N-1):
-            ap[j] = 2 * a
-            bp[j] = -2 * sgm + 2*(h**2)*c - 4 * a
-            cp[j] = 2 * a
-            dp[j] = -4 * sgm * u[k-1][j] + (2 * sgm * u[k-2][j])
+            a[j] = sigma
+            b[j] = 2 * (1 - sigma)
+            c[j] = sigma
+            d[j] = u[k+1][j] + u[k-1][j]
 
-        ap[-1] = 0
-        bp[-1] = 1
-        cp[-1] = 0
-        dp[-1] = phi1(tau * k)
+        a[-1] = 0
+        b[-1] = 1
+        c[-1] = 0
+        d[-1] = phi1(tau * k)
 
-        u[k] = swp(ap,bp,cp,dp)
+        u[k] = swp(a,b,c,d)
 
     return u
 
@@ -147,32 +147,10 @@ def accuracy_error(tk,xn,u):
     plt.grid(True)
     plt.show()
 
-# Погрешность в различные моменты времени
-
-def result(ti, xi, u1, u2):
-    fig,ax = plt.subplots(4)
-    fig.set_figheight(10)
-    fig.set_figwidth(15)
-    t = 0
-    for i in range(4):
-        ax[i].plot(xi, u1[t, :], label='explicit')
-        ax[i].plot(xi, u2[t, :], label='implicit')
-        ax[i].plot(xi, [exact(x, ti[t]) for x in xi], label='Analytic')
-        ax[i].grid(True)
-        ax[i].set_xlabel('x')
-        ax[i].set_ylabel('u')
-        ax[i].set_title(f'Решения при t = {t / K}')
-        t = K - (i+2)*100
-
-    plt.legend()
-    plt.show()
-
 # Main
 
 u1 = explicit()
 u2 = implicit()
-
-result(tk,xn,u1,u2)
 
 accuracy_error(tk,xn,u1)
 accuracy_error(tk,xn,u2)
