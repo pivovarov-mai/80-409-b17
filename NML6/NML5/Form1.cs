@@ -73,8 +73,8 @@ namespace NML5
                 }
                 else if (apr == 2) 
                 {
-                    u[k + 1, 0] = (u[k + 1, 1] + 1 / (2 * sig) * (2 * u[k, 0] - u[k - 1, 0])) / (h + 1 + 1 / (2 * sig));
-                    u[k + 1, N] = (u[k + 1, N - 1] + 1 / (2 * sig) * (2 * u[k, N] - u[k - 1, N])) / (-h + 1 + 1 / (2 * sig));
+                    u[k + 1, 0] = (u[k + 1, 1] / h + h * u[k, 0] / (2 * Math.Pow(a, 2) * tau)) / (1 / h + h / (2 * Math.Pow(a, 2) * tau) + 1);
+                    u[k + 1, N] = (u[k + 1, N - 1] / h + h * u[k, N] / (2 * Math.Pow(a, 2) * tau)) / (1 / h + h / (2 * Math.Pow(a, 2) * tau) - 1);
                 }
             }
             if (apr == 0)
@@ -150,8 +150,8 @@ namespace NML5
                 }
                 else if (apr == 2)
                 {
-                    b[0] = 1 + 1 / (2 * sig) + h; c[0] = -1; d[0] = 1 / (2 * sig) * (2 * u[k, 0] - u[k - 1, 0]);
-                    a[N - 1] = -1; b[N] = 1 + 1 / (2 * sig) - h; d[N] = 1 / (2 * sig) * (2 * u[k, N] - u[k - 1, N]); 
+                    b[0] = 1 / h + h / (2 * Math.Pow(this.a, 2) * tau) + 1; c[0] = -1 / h; d[0] = h * u[k, 0] / (2 * Math.Pow(this.a, 2) * tau);
+                    a[N - 1] = -1 / h; b[N] = 1 / h + h / (2 * Math.Pow(this.a, 2) * tau) - 1; d[N] = h * u[k, N] / (2 * Math.Pow(this.a, 2) * tau); 
                 }
                 x = Progon(a,b,c,d).ToArray();
                 for (int j = 0; j <= N; j++)
