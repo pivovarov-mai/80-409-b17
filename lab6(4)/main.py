@@ -168,6 +168,7 @@ def result(ti, xi, u1, u2):
     plt.show()
 
 # Main
+
 u1 = explicit()
 u2 = implicit()
 
