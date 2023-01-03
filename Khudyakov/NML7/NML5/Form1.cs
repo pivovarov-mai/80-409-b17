@@ -8,8 +8,7 @@ namespace NML5
     {
         
         int M;
-        static int N = 16;
-        static double e = 0.00001;
+        static int N = 10;
         int K = N;
         double l = 1;
         double[,] U = new double[N + 1, N + 1];
@@ -154,6 +153,7 @@ namespace NML5
             double[] dup = new double[d.Length];
             double[] x = new double[d.Length];
             double[] x1 = new double[d.Length];
+            double e = 0.001;
             double max = 0;
             for (int i = 0; i < d.Length; i++)
             {
@@ -200,6 +200,7 @@ namespace NML5
             double[] x = new double[d.Length];
             double[] x1 = new double[d.Length];
             double[] x2 = new double[d.Length];
+            double e = 0.001;
             double max = 0;
             for (int i = 0; i < d.Length; i++)
             {
@@ -249,7 +250,8 @@ namespace NML5
             double[] x = new double[d.Length];
             double[] x1 = new double[d.Length];
             double[] x2 = new double[d.Length];
-            double w = 1.01;
+            double e = 0.001;
+            double w = 1.02865;
             double max = 0;
             for (int i = 0; i < d.Length; i++)
             {
