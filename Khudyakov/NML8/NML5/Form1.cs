@@ -10,7 +10,7 @@ namespace NML5
         static int M;
         static int T;
         static int K = 100;
-        static int nuvar = 1;
+        static int nuvar = 2;
         static int Nx = 20;
         static int Ny = Nx;
         double a = 1;
@@ -21,8 +21,8 @@ namespace NML5
         static double[,] nu = { { 1, 1 }, { 2, 1 }, { 1, 2 } };
         static double nu1 = nu[nuvar, 0];
         static double nu2 = nu[nuvar, 1];
-        static double lx = Math.PI / 2 * nu1;
-        static double ly = Math.PI / 2 * nu2;
+        static double lx = Math.PI/2 * nu1;
+        static double ly = Math.PI/2 * nu2;
         double hx = lx / Nx;
         double hy = ly / Ny;
         double tau = 0.01;
@@ -48,10 +48,10 @@ namespace NML5
             trackBar1.Minimum = 0;
             trackBar1.Maximum = Nx;
         }
-
+        
         private void paintY()
         {
-            double u, x;
+            double u, x ;
             double y = M * hy;
             chart1.Series[0].Points.Clear();
             chart1.ChartAreas[0].AxisY.LabelStyle.Format = "f2";
@@ -99,7 +99,7 @@ namespace NML5
             double sigy = this.a * tau / (2 * Math.Pow(hy, 2));
             for (int i = 0; i <= Nx; i++)
                 for (int j = 0; j <= Ny; j++) u[i, j, 0] = Math.Cos(nu1 * hx * i) * Math.Cos(nu2 * hy * j);
-            for (int k = 1; k <= K; k++)
+            for(int k = 1; k <= K; k++)
             {
                 double t = k * tau - tau / 2;
                 for (int j = 1; j <= Ny - 1; j++)
@@ -213,6 +213,7 @@ namespace NML5
             }
             return u;
         }
+
         private double f(double x, double y, double t) // Точное значение функции
         {
             return Math.Cos(nu[nuvar, 0] * x) * Math.Cos(nu[nuvar, 1] * y) * Math.Exp(-(Math.Pow(nu[nuvar, 0], 2) + Math.Pow(nu[nuvar, 1], 2)) * a * t);
